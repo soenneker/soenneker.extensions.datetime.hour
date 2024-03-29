@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics.Contracts;
-using Soenneker.Enums.DateTimePrecision;
+using Soenneker.Enums.UnitOfTime;
 
 namespace Soenneker.Extensions.DateTime.Hour;
 
@@ -20,7 +20,7 @@ public static class DateTimeHourExtension
     [Pure]
     public static System.DateTime ToStartOfHour(this System.DateTime dateTime)
     {
-        return dateTime.ToStartOf(DateTimePrecision.Hour);
+        return dateTime.ToStartOf(UnitOfTime.Hour);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public static class DateTimeHourExtension
     [Pure]
     public static System.DateTime ToEndOfHour(this System.DateTime dateTime)
     {
-        return dateTime.ToEndOf(DateTimePrecision.Hour);
+        return dateTime.ToEndOf(UnitOfTime.Hour);
     }
 
     /// <summary>
