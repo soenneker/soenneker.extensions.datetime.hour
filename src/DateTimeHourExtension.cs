@@ -109,4 +109,45 @@ public static class DateTimeHourExtension
         System.DateTime result = dateTime.ToEndOfHour().AddHours(-1);
         return result;
     }
+
+    /// <summary>
+    /// Converts the specified UTC <see cref="System.DateTime"/> to the specified time zone
+    /// and returns the time in "h:mmtt" format.
+    /// </summary>
+    /// <param name="utc">The UTC <see cref="System.DateTime"/> to convert.</param>
+    /// <param name="tzInfo">The <see cref="System.TimeZoneInfo"/> representing the desired time zone.</param>
+    /// <returns>A string representing the time in "h:mmtt" format.</returns>
+    [Pure]
+    public static string ToTzHourFormat(this System.DateTime utc, System.TimeZoneInfo tzInfo)
+    {
+        System.DateTime tz = utc.ToTz(tzInfo);
+
+        return tz.ToHourFormat();
+    }
+
+    /// <summary>
+    /// Converts the specified UTC <see cref="System.DateTime"/> to the start of the hour
+    /// in the specified time zone and returns the time in "h:mmtt" format.
+    /// </summary>
+    /// <param name="utc">The UTC <see cref="System.DateTime"/> to convert.</param>
+    /// <param name="tzInfo">The <see cref="System.TimeZoneInfo"/> representing the desired time zone.</param>
+    /// <returns>A string representing the start of the hour in "h:mmtt" format.</returns>
+    [Pure]
+    public static string ToTzHourFormatWithTrim(this System.DateTime utc, System.TimeZoneInfo tzInfo)
+    {
+        System.DateTime tz = utc.ToTz(tzInfo).ToStartOfHour();
+
+        return tz.ToHourFormat();
+    }
+
+    /// <summary>
+    /// Converts the specified <see cref="System.DateTime"/> to a string in "h:mmtt" format.
+    /// </summary>
+    /// <param name="dateTime">The <see cref="System.DateTime"/> to format.</param>
+    /// <returns>A string representing the time in "h:mmtt" format.</returns>
+    [Pure]
+    public static string ToHourFormat(this System.DateTime dateTime)
+    {
+        return dateTime.ToString("h:mmtt");
+    }
 }
