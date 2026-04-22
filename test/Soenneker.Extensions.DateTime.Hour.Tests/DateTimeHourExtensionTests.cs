@@ -1,6 +1,5 @@
 using AwesomeAssertions;
 using System;
-using Xunit;
 
 namespace Soenneker.Extensions.DateTime.Hour.Tests;
 
