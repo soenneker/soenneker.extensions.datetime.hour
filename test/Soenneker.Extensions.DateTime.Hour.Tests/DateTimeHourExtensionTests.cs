@@ -5,11 +5,11 @@ namespace Soenneker.Extensions.DateTime.Hour.Tests;
 
 public class DateTimeHourExtensionTests
 {
-    [Theory]
-    [InlineData(2024, 5, 20, 14, "Eastern Standard Time", "10:00 AM")]
-    [InlineData(2024, 5, 20, 9, "Eastern Standard Time", "5:00 AM")]
-    [InlineData(2024, 5, 20, 0, "Pacific Standard Time", "5:00 PM")]
-    [InlineData(2024, 5, 20, 23, "Pacific Standard Time", "4:00 PM")]
+    [Test]
+    [Arguments(2024, 5, 20, 14, "Eastern Standard Time", "10:00 AM")]
+    [Arguments(2024, 5, 20, 9, "Eastern Standard Time", "5:00 AM")]
+    [Arguments(2024, 5, 20, 0, "Pacific Standard Time", "5:00 PM")]
+    [Arguments(2024, 5, 20, 23, "Pacific Standard Time", "4:00 PM")]
     public void ToTzHourFormatFromUtc_ShouldReturnCorrectHourFormat(int year, int month, int day, int utcHour, string timeZoneId, string expected)
     {
         // Arrange
@@ -23,3 +23,4 @@ public class DateTimeHourExtensionTests
         result.Should().Be(expected);
     }
 }
+
