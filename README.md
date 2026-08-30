@@ -5,7 +5,7 @@
 
 # ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Extensions.DateTime.Hour
 
-A collection of helpful DateTime hour-based extension methods.
+Provides hour boundaries, previous/next hour navigation, and time-zone-aware hour formatting for `DateTime`.
 
 ## Installation
 
@@ -13,25 +13,51 @@ A collection of helpful DateTime hour-based extension methods.
 dotnet add package Soenneker.Extensions.DateTime.Hour
 ```
 
-## Quick start
+## Hour boundaries
 
 ```csharp
 using Soenneker.Extensions.DateTime.Hour;
 
-DateTime dateTime = DateTime.UtcNow;
-var result = dateTime.ToStartOfHour();
+System.DateTime value = new(2026, 8, 29, 16, 42, 30, DateTimeKind.Utc);
+
+System.DateTime start = value.ToStartOfHour();
+System.DateTime end = value.ToEndOfHour();
+System.DateTime previousStart = value.ToStartOfPreviousHour();
+System.DateTime nextEnd = value.ToEndOfNextHour();
 ```
 
-## Common operations
+| Method | Result for `16:42:30` |
+| --- | --- |
+| `ToStartOfHour()` | `16:00:00` |
+| `ToEndOfHour()` | One tick before `17:00:00` |
+| `ToStartOfPreviousHour()` | `15:00:00` |
+| `ToEndOfPreviousHour()` | One tick before `16:00:00` |
+| `ToStartOfNextHour()` | `17:00:00` |
+| `ToEndOfNextHour()` | One tick before `18:00:00` |
 
-- `ToStartOfHour()` - Adjusts the specified `System.DateTime` to the start of the current hour, effectively setting minutes, seconds, and milliseconds to zero. Returns a new `System.DateTime` representing the start of the hour for the provided datetime. The returned datetime will retain the original `DateTimeKind`.
-- `ToStartOfNextHour()` - Adjusts the specified `System.DateTime` to the start of the next hour. Returns a new `System.DateTime` representing the start of the next hour. The returned datetime will retain the original `DateTimeKind`. This method does not take into account the time zone of the provided DateTime.
-- `ToStartOfPreviousHour()` - Adjusts the specified `System.DateTime` to the start of the previous hour. Returns a new `System.DateTime` representing the start of the previous hour. The returned datetime will retain the original `DateTimeKind`. This method does not account for the time zone of the provided DateTime and retains the original DateTimeKind.
-- `ToEndOfHour()` - Adjusts the specified `System.DateTime` to the end of the current hour, setting minutes and seconds to 59 and 59 respectively, and milliseconds to 999. Returns a new `System.DateTime` representing the end of the current hour. The returned datetime will retain the original `DateTimeKind`. This method disregards the time zone of the provided DateTime.
-- `ToEndOfNextHour()` - Adjusts the given `System.DateTime` instance to the end of the next hour following the hour of the specified DateTime. Returns a `System.DateTime` that represents the last moment (one tick before the start of the next following hour) of the next hour after the one in which the specified DateTime falls.
-- `ToEndOfPreviousHour()` - Adjusts the given `System.DateTime` instance to the end of the hour immediately preceding the hour of the specified DateTime.
-- `ToTzHourFormat()` - Converts the specified UTC `System.DateTime` to the specified time zone and returns the time in "h:mmtt" format.
-- `ToTzHourFormatWithTrim()` - Converts the specified UTC `System.DateTime` to the start of the hour in the specified time zone and returns the time in "h:mmtt" format.
-- `ToHourFormat()` - Converts the specified `System.DateTime` to a string in "h:mmtt" format. Returns a string representing the time in "h:mmtt" format.
-- `ToTzHoursFromUtc()` - Converts a specific hour in UTC to its corresponding hour in a specified time zone. Returns the corresponding hour in the specified time zone, adjusted to a positive number in the 24-hour format. This can include returning 24 to indicate midnight.
-- `ToTzHourFormatFromUtc()` - Converts the given UTC hour to a specific time zone's hour format with AM/PM notation. Returns a string representing the hour in the specified time zone with AM/PM format.
+These methods operate on the existing clock fields. They do not perform time-zone conversion and preserve the input `Kind`.
+
+## Formatting
+
+```csharp
+string clock = value.ToHourFormat(); // 4:42 PM
+
+TimeZoneInfo eastern = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+string easternClock = value.ToTzHourFormat(eastern);
+string easternHour = value.ToTzHourFormatWithTrim(eastern);
+```
+
+All three methods use the `h:mm tt` format and the current culture. `ToTzHourFormat()` converts the UTC input to the target wall clock. `ToTzHourFormatWithTrim()` also resets local minutes and seconds to zero.
+
+## Convert a UTC hour
+
+```csharp
+System.DateTime referenceDate = new(2026, 8, 29, 0, 0, 0, DateTimeKind.Utc);
+TimeZoneInfo india = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+
+string localHour = referenceDate.ToTzHourFormatFromUtc(0, india); // 5:30 AM
+```
+
+`ToTzHourFormatFromUtc()` combines the date from the reference value with `utcHour`, converts that UTC instant to the supplied zone, and preserves fractional-hour offsets in the formatted result. Values outside `0–23` roll into the adjacent UTC date through normal `DateTime.AddHours()` behavior.
+
+`ToTzHoursFromUtc()` returns only an integer hour from `0` through `23`. It uses the whole-hour component of the zone offset applicable on the reference date, so it cannot represent the minutes in half-hour or quarter-hour zones. Use the formatted method when those minutes matter.

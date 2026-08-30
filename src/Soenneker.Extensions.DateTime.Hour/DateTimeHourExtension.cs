@@ -112,11 +112,11 @@ public static class DateTimeHourExtension
 
     /// <summary>
     /// Converts the specified UTC <see cref="System.DateTime"/> to the specified time zone
-    /// and returns the time in "h:mmtt" format.
+    /// and returns the time in "h:mm tt" format.
     /// </summary>
     /// <param name="utc">The UTC <see cref="System.DateTime"/> to convert.</param>
     /// <param name="tzInfo">The <see cref="System.TimeZoneInfo"/> representing the desired time zone.</param>
-    /// <returns>A string representing the time in "h:mmtt" format.</returns>
+    /// <returns>A string representing the time in "h:mm tt" format.</returns>
     [Pure]
     public static string ToTzHourFormat(this System.DateTime utc, System.TimeZoneInfo tzInfo)
     {
@@ -127,11 +127,11 @@ public static class DateTimeHourExtension
 
     /// <summary>
     /// Converts the specified UTC <see cref="System.DateTime"/> to the start of the hour
-    /// in the specified time zone and returns the time in "h:mmtt" format.
+    /// in the specified time zone and returns the time in "h:mm tt" format.
     /// </summary>
     /// <param name="utc">The UTC <see cref="System.DateTime"/> to convert.</param>
     /// <param name="tzInfo">The <see cref="System.TimeZoneInfo"/> representing the desired time zone.</param>
-    /// <returns>A string representing the start of the hour in "h:mmtt" format.</returns>
+    /// <returns>A string representing the start of the hour in "h:mm tt" format.</returns>
     [Pure]
     public static string ToTzHourFormatWithTrim(this System.DateTime utc, System.TimeZoneInfo tzInfo)
     {
@@ -141,10 +141,10 @@ public static class DateTimeHourExtension
     }
 
     /// <summary>
-    /// Converts the specified <see cref="System.DateTime"/> to a string in "h:mmtt" format.
+    /// Converts the specified <see cref="System.DateTime"/> to a string in "h:mm tt" format.
     /// </summary>
     /// <param name="dateTime">The <see cref="System.DateTime"/> to format.</param>
-    /// <returns>A string representing the time in "h:mmtt" format.</returns>
+    /// <returns>A string representing the time in "h:mm tt" format.</returns>
     [Pure]
     public static string ToHourFormat(this System.DateTime dateTime)
     {
@@ -156,19 +156,18 @@ public static class DateTimeHourExtension
     /// </summary>
     /// <remarks>
     /// This method calculates the time zone equivalent of a specified UTC hour, accounting for the specified time zone's offset from UTC, including any adjustments for daylight saving time (DST). 
-    /// The conversion ensures that the result is always a positive hour in the 24-hour format. This method is designed to wrap around the clock, so a conversion resulting in negative hours or hours beyond 24 will be adjusted to fit within the 0-24 range.
-    /// Note: It's possible for the method to return 24, which is equivalent to 0 and represents midnight at the start of a new day.
+    /// The conversion wraps across day boundaries and returns an hour from 0 through 23.
     /// </remarks>
     /// <param name="utcNow">The current UTC date and time, used to calculate the correct time zone offset, including consideration for DST.</param>
     /// <param name="utcHour">The hour in UTC to be converted, specified in the 24-hour format.</param>
     /// <param name="timeZoneInfo">The time zone to which the UTC hour will be converted.</param>
-    /// <returns>The corresponding hour in the specified time zone, adjusted to a positive number in the 24-hour format. This can include returning 24 to indicate midnight.</returns>
+    /// <returns>The corresponding whole hour in the specified time zone, from 0 through 23.</returns>
     [Pure]
     public static int ToTzHoursFromUtc(this System.DateTime utcNow, int utcHour, System.TimeZoneInfo timeZoneInfo)
     {
         int utcHoursOffset = utcNow.ToTzOffsetHours(timeZoneInfo);
 
-        int tzHour = utcHour + utcHoursOffset;
+        int tzHour = (utcHour + utcHoursOffset) % 24;
 
         if (tzHour < 0)
             tzHour += 24;
@@ -186,9 +185,8 @@ public static class DateTimeHourExtension
     [Pure]
     public static string ToTzHourFormatFromUtc(this System.DateTime utcNow, int utcHour, System.TimeZoneInfo timeZoneInfo)
     {
-        int hour = utcNow.ToTzHoursFromUtc(utcHour, timeZoneInfo);
-        System.DateTime startOfDay = utcNow.ToTz(timeZoneInfo).ToStartOf(UnitOfTime.Day, DateTimeKind.Unspecified);
-        System.DateTime hours = startOfDay.AddHours(hour);
-        return hours.ToHourFormat();
+        System.DateTime utcHourInstant = utcNow.ToUtcKind().Date.AddHours(utcHour);
+        System.DateTime local = System.TimeZoneInfo.ConvertTimeFromUtc(utcHourInstant, timeZoneInfo);
+        return local.ToHourFormat();
     }
 }
