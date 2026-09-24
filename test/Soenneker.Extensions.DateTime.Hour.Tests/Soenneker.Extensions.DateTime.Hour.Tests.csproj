@@ -14,5 +14,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Soenneker.Extensions.DateTime.Hour\Soenneker.Extensions.DateTime.Hour.csproj" />
     </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
+    </ItemGroup>
 </Project>
 
