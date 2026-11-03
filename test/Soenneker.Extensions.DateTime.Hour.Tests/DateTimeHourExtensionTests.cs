@@ -10,7 +10,7 @@ public class DateTimeHourExtensionTests
     [Arguments(2024, 5, 20, 9, "Eastern Standard Time", "5:00 AM")]
     [Arguments(2024, 5, 20, 0, "Pacific Standard Time", "5:00 PM")]
     [Arguments(2024, 5, 20, 23, "Pacific Standard Time", "4:00 PM")]
-    [Arguments(2024, 5, 20, 0, "India Standard Time", "5:30 AM")]
+    [Arguments(2024, 5, 20, 0, "Asia/Kolkata", "5:30 AM")]
     public void ToTzHourFormatFromUtc_ShouldReturnCorrectHourFormat(int year, int month, int day, int utcHour, string timeZoneId, string expected)
     {
         // Arrange
